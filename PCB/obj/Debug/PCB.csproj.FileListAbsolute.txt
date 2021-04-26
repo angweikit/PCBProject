@@ -1,0 +1,10 @@
+C:\Users\USER\source\repos\PCB\PCB\bin\Debug\PCB.exe.config
+C:\Users\USER\source\repos\PCB\PCB\bin\Debug\PCB.exe
+C:\Users\USER\source\repos\PCB\PCB\bin\Debug\PCB.pdb
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.csprojAssemblyReference.cache
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.Form1.resources
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.Properties.Resources.resources
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.csproj.GenerateResource.cache
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.exe
+C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.pdb
