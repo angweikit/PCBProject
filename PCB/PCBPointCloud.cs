@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -86,6 +87,33 @@ namespace PCB
             }
         }
 
+        public void Draw_Plane(float Length, float Width, List<Point3f> Position)
+        {
+            for (int Iterator = 0; Iterator < Position.Count; Iterator++)
+            {
+                float Mid_Length;
+                float Mid_Width;
+
+                float StartingX, EndingX;
+                float StartingY, EndingY;
+
+                Mid_Length = Length / 2;
+                Mid_Width = Width / 2;
+
+                StartingX = Position.x - Mid_Length;
+                EndingX = Position.x - Mid_Length;
+
+                StartingY = Position.y - Mid_Width;
+                EndingY = Position.y + Mid_Width;
+            }
+            
+        }
+
+        public void Draw_Box()
+        {
+
+        }
+
         public void PointCloud_Generate(List<Component> PCBWay_Input)
         {
             float SizeX, SizeY;
@@ -114,16 +142,17 @@ namespace PCB
 
                 Processing = PCBWay_Input[Iterator];
 
-                SizeX = int.Parse(Processing.footprint.Substring(0, 2));
-                SizeY = int.Parse(Processing.footprint.Substring(2, 2));
+                SizeX = int.Parse(Processing.footprint.Substring(0, 2));  // Record is 0603R  (This variable just get 06)
+                SizeY = int.Parse(Processing.footprint.Substring(2, 2));  // Record is 0603R  (This variable just get 03)
 
-                PositionX = Processing.midX / 10;
-                PositionY = Processing.midY / 10;
+                PositionX = Processing.midX / 10;  // Record Mid X is 660.236mil, change it to 66.0236 
+                PositionY = Processing.midY / 10;  // Record Mid Y is 1603.937mil, change it to 160.3937
 
-                MidSizeX = SizeX / 2;
-                MidSizeY = SizeY / 2;
+                MidSizeX = SizeX / 2;  // Find the mid of size X (The middle of 6 is 3)
+                MidSizeY = SizeY / 2;  // Find the mid of size Y (The middle of 3 is 1.5)
 
-                StartingX = PositionX - MidSizeX;
+                // Find the start and end point
+                StartingX = PositionX - MidSizeX; 
                 EndingX = PositionX + MidSizeX;
 
                 StartingY = PositionY - MidSizeY;
@@ -133,7 +162,9 @@ namespace PCB
                 {
                     for (float IteratorX = StartingX; IteratorX < (EndingX + Increment); IteratorX += Increment)
                     {
+                        // First plane on top
                         writer.Write(IteratorX.ToString("0.0000") + "    " + IteratorY.ToString("0.0000") + "    " + Z_Top.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
+                        // Second plane on bottom
                         writer.Write(IteratorX.ToString("0.0000") + "    " + IteratorY.ToString("0.0000") + "    " + Z_Bottom.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
 
                         if (IteratorY == StartingY || IteratorY == EndingY || IteratorX == StartingX || IteratorX == EndingX)
@@ -142,7 +173,8 @@ namespace PCB
                             {
                                 writer.Write(IteratorX.ToString("0.0000") + "    " + IteratorY.ToString("0.0000") + "    " + IteratorZ.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
                             }
-                        }                        
+                        }
+                        
                     }
                 }
 
@@ -150,10 +182,18 @@ namespace PCB
             writer.Close();
         }
     }
+
+    public class Point3f
+    {
+        public float x, y, z;
+    }
+    public class angle
+    {
+        public float angleX, angleY, angleZ;
+    }
     public class Component
     {
         public string designator, footprint, topbottom, comment;
         public float midX, midY, refX, refY, padX, padY, rotation;
-        
     }
 }
