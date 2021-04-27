@@ -44,10 +44,11 @@ namespace PCB
                     string[] lines = System.IO.File.ReadAllLines(fileName);
                     //PointCloudSize = lines.GetLength(0) * VertexAttribSize;
 
-                    List<Component> pcbWay = new List<Component>();   
+                    List<Component> pcbWay = new List<Component>();
+                    List<Point3f> Store_BoxPlane_Point = new List<Point3f>();
 
                     PCBWayList(lines, out pcbWay);
-                    Draw_Box(pcbWay);
+                    Draw_Box(pcbWay, out Store_BoxPlane_Point);
                 }
                 catch (Exception err)
                 {
@@ -137,9 +138,9 @@ namespace PCB
             }
         }
 
-        public void Draw_Box(List<Component> PCBWay_Input)
+        public void Draw_Box(List<Component> PCBWay_Input, out List<Point3f> Store_BoxPlane_Point)
         {
-            string FilePath = @"C:\Users\USER\Desktop\test123.txt"; // set the file path
+            string FilePath = @"C:\Users\USER\Desktop\Documentation\PCB\test123.txt"; // set the file path
 
             FileStream fs1 = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write); // Create a new text file
             StreamWriter writer = new StreamWriter(fs1);
@@ -150,7 +151,7 @@ namespace PCB
             float Mid_Length, Mid_Width, Mid_Height;
 
             List<Point3f> Generate_Plane_Point = new List<Point3f>();
-            List<Point3f> Store_BoxPlane_Point = new List<Point3f>();
+            Store_BoxPlane_Point = new List<Point3f>();
 
             for (int Iterator = 0; Iterator < PCBWay_Input.Count; Iterator++)
             {
