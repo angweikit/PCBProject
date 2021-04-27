@@ -87,26 +87,33 @@ namespace PCB
             }
         }
 
-        public void Draw_Plane(float Length, float Width, List<Point3f> Position)
+        public void Draw_Plane(float Length, float Width, Point3f Position, out List<Point3f> PointCloud_Plane)
         {
-            for (int Iterator = 0; Iterator < Position.Count; Iterator++)
+            PointCloud_Plane = new List<Point3f>();
+
+            float Increment = 0.05f;
+            float Mid_Length;
+            float Mid_Width;
+
+            float StartingX, EndingX;
+            float StartingY, EndingY;
+
+            Mid_Length = Length / 2;
+            Mid_Width = Width / 2;
+
+            StartingX = Position.x - Mid_Length;
+            EndingX = Position.x - Mid_Length;
+
+            StartingY = Position.y - Mid_Width;
+            EndingY = Position.y + Mid_Width;
+
+            for (float IteratorY = StartingY; IteratorY < (EndingY + Increment); IteratorY += Increment)
             {
-                float Mid_Length;
-                float Mid_Width;
+                for (float IteratorX = StartingX; IteratorX < (EndingX + Increment); IteratorX += Increment)
+                {
 
-                float StartingX, EndingX;
-                float StartingY, EndingY;
-
-                Mid_Length = Length / 2;
-                Mid_Width = Width / 2;
-
-                StartingX = Position.x - Mid_Length;
-                EndingX = Position.x - Mid_Length;
-
-                StartingY = Position.y - Mid_Width;
-                EndingY = Position.y + Mid_Width;
+                }
             }
-            
         }
 
         public void Draw_Box()
@@ -186,11 +193,7 @@ namespace PCB
     public class Point3f
     {
         public float x, y, z;
-    }
-    public class angle
-    {
-        public float angleX, angleY, angleZ;
-    }
+    }   
     public class Component
     {
         public string designator, footprint, topbottom, comment;
