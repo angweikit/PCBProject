@@ -44,17 +44,10 @@ namespace PCB
                     string[] lines = System.IO.File.ReadAllLines(fileName);
                     //PointCloudSize = lines.GetLength(0) * VertexAttribSize;
 
-                    List<Component> pcbWay = new List<Component>();
-                    List<Point3f> Plane_MidPoint = new List<Point3f>();
-
-                    float Mid_Length = 0;
-                    float Mid_Width = 0;
-                    float Mid_Height = 0;
+                    List<Component> pcbWay = new List<Component>();   
 
                     PCBWayList(lines, out pcbWay);
-                    //PointCloud_Generate(pcbWay);
-                    Draw_Box(pcbWay, out Mid_Length, out Mid_Width, out Mid_Height, out Plane_MidPoint);
-                    Draw_Plane(Mid_Length, Mid_Width, Mid_Height, Plane_MidPoint);
+                    Draw_Box(pcbWay);
                 }
                 catch (Exception err)
                 {
@@ -87,23 +80,18 @@ namespace PCB
             }
         }
 
-        public void Draw_Plane(float Length, float Width, float Height, List<Point3f> Plane_MidPoint)
+        public void Draw_Plane(float Length, float Width, float Height, List<Point3f> Plane_MidPoint, out List<Point3f> PointCloud_Plane)
         {
-            List<Point3f> PointCloud_Plane = new List<Point3f>();
-
-            string FilePath = @"C:\Users\USER\Desktop\test123.txt"; // set the file path
-
-            FileStream fs1 = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write); // Create a new text file
-            StreamWriter writer = new StreamWriter(fs1);
+            PointCloud_Plane = new List<Point3f>();
 
             float Increment = 0.05f;
+            float Ending_Increment = 0.01f;
 
             float StartingX, EndingX;
             float StartingY, EndingY;
             float StartingZ, EndingZ;
-            float i = 200;
 
-            for (int Iterator = 0; Iterator < Plane_MidPoint.Count; Iterator++)
+            for (int Iterator = 0; Iterator < Plane_MidPoint.Count; Iterator ++)
             {
                 StartingX = Plane_MidPoint[Iterator].x - Length;
                 EndingX = Plane_MidPoint[Iterator].x + Length;
@@ -114,75 +102,64 @@ namespace PCB
                 StartingZ = Plane_MidPoint[Iterator].z - Height;
                 EndingZ = Plane_MidPoint[Iterator].z + Height;
 
-                if (Iterator == 0 || Iterator == 1)
-                {                
-                    for (float IteratorY = StartingY; IteratorY < (EndingY + Increment); IteratorY += Increment)
+                if (Iterator == 0 || Iterator == 1) // Top and Bottom Plane
+                {
+                    StartingZ = Plane_MidPoint[Iterator].z;
+                    EndingZ = Plane_MidPoint[Iterator].z;
+                }
+                else if (Iterator == 2 || Iterator == 3)  // Front and Back Plane
+                {
+                    StartingY = Plane_MidPoint[Iterator].y;
+                    EndingY = Plane_MidPoint[Iterator].y;
+                }
+                else if (Iterator == 4 || Iterator == 5) // Left and Right Plane
+                {
+                    StartingX = Plane_MidPoint[Iterator].x;
+                    EndingX = Plane_MidPoint[Iterator].x;
+                }
+
+                for (float IteratorY = StartingY; IteratorY < (EndingY + Ending_Increment); IteratorY += Increment)
+                {
+                    for (float IteratorX = StartingX; IteratorX < (EndingX + Ending_Increment); IteratorX += Increment)
                     {
-                        for (float IteratorX = StartingX; IteratorX < (EndingX + Increment); IteratorX += Increment)
+                        for (float IteratorZ = StartingZ; IteratorZ < (EndingZ + Ending_Increment); IteratorZ += Increment)
                         {
                             Point3f Generate_Plane_Point = new Point3f();
 
                             Generate_Plane_Point.x = IteratorX;
                             Generate_Plane_Point.y = IteratorY;
-                            Generate_Plane_Point.z = Plane_MidPoint[Iterator].z;
-
-                            PointCloud_Plane.Add(Generate_Plane_Point);
-                            writer.Write(Generate_Plane_Point.x.ToString("0.0000") + "    " + Generate_Plane_Point.y.ToString("0.0000") + "    " + Generate_Plane_Point.z.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
-                        }
-                    }
-                }
-                else if (Iterator == 2 || Iterator == 3)
-                {
-                    for (float IteratorZ = StartingZ; IteratorZ < (EndingZ); IteratorZ += Increment)
-                    {
-                        for (float IteratorX = StartingX; IteratorX < (EndingX + Increment); IteratorX += Increment)
-                        {
-                            Point3f Generate_Plane_Point = new Point3f();
-
-                            Generate_Plane_Point.x = IteratorX;
-                            Generate_Plane_Point.y = Plane_MidPoint[Iterator].y;
                             Generate_Plane_Point.z = IteratorZ;
 
                             PointCloud_Plane.Add(Generate_Plane_Point);
-                            writer.Write(Generate_Plane_Point.x.ToString("0.0000") + "    " + Generate_Plane_Point.y.ToString("0.0000") + "    " + Generate_Plane_Point.z.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
-                        }
-                    }
-                }
-                else if (Iterator == 4 || Iterator == 5)
-                {
-                    for (float IteratorZ = StartingZ; IteratorZ < (EndingZ); IteratorZ += Increment)
-                    {
-                        for (float IteratorY = StartingY; IteratorY < (EndingY + Increment); IteratorY += Increment)
-                        {
-                            Point3f Generate_Plane_Point = new Point3f();
-
-                            Generate_Plane_Point.x = Plane_MidPoint[Iterator].x;
-                            Generate_Plane_Point.y = IteratorY;
-                            Generate_Plane_Point.z = IteratorZ;
-
-                            PointCloud_Plane.Add(Generate_Plane_Point);
-                            writer.Write(Generate_Plane_Point.x.ToString("0.0000") + "    " + Generate_Plane_Point.y.ToString("0.0000") + "    " + Generate_Plane_Point.z.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
                         }
                     }
                 }
             }
-            writer.Close();
         }
 
-        public void Draw_Box(List<Component> PCBWay_Input, out float Mid_Length, out float Mid_Width, out float Mid_Height, out List<Point3f> Plane_MidPoint)
+        public void Draw_Box(List<Component> PCBWay_Input)
         {
-            float z = 60;
-            float SizeX, SizeY, SizeZ;
-            Mid_Length = 0; Mid_Width = 0; Mid_Height = 0;
+            string FilePath = @"C:\Users\USER\Desktop\test123.txt"; // set the file path
 
-            Plane_MidPoint = new List<Point3f>();
+            FileStream fs1 = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write); // Create a new text file
+            StreamWriter writer = new StreamWriter(fs1);
+
+            float i = 200;
+            float z = 60; // coordinate z
+            float SizeX, SizeY, SizeZ;
+            float Mid_Length, Mid_Width, Mid_Height;
+
+            List<Point3f> Generate_Plane_Point = new List<Point3f>();
+            List<Point3f> Store_BoxPlane_Point = new List<Point3f>();
 
             for (int Iterator = 0; Iterator < PCBWay_Input.Count; Iterator++)
             {
+                List<Point3f> Plane_MidPoint = new List<Point3f>();
                 Point3f Position = new Point3f();
+                
                 SizeX = int.Parse(PCBWay_Input[Iterator].footprint.Substring(0, 2));  // Record is 0603R  (This variable just get 06)
                 SizeY = int.Parse(PCBWay_Input[Iterator].footprint.Substring(2, 2));  // Record is 0603R  (This variable just get 03)
-                SizeZ = 1;
+                SizeZ = 1; 
 
                 Mid_Length = SizeX / 2;
                 Mid_Width = SizeY / 2;
@@ -232,74 +209,16 @@ namespace PCB
                         Mid.z = Position.z;
                     }
                     Plane_MidPoint.Add(Mid);
-                }             
-            }
-        }
-
-        public void PointCloud_Generate(List<Component> PCBWay_Input)
-        {
-            float SizeX, SizeY;
-
-            float MidSizeX;
-            float MidSizeY;
-
-            float Z_Top = 61;
-            float Z_Bottom = 60;
-            float i = 200;
-
-            float PositionX, PositionY;
-
-            float StartingX, EndingX;
-            float StartingY, EndingY;
-            float Increment = 0.05f;
-
-            string FilePath = @"C:\Users\USER\Desktop\Documentation\PCB\test123.txt"; // set the file path
-
-            FileStream fs1 = new FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write); // Create a new text file
-            StreamWriter writer = new StreamWriter(fs1);
-
-            for (int Iterator = 0; Iterator < PCBWay_Input.Count; Iterator++)
-            {
-                Component Processing = new Component();
-
-                Processing = PCBWay_Input[Iterator];
-
-                SizeX = int.Parse(Processing.footprint.Substring(0, 2));  // Record is 0603R  (This variable just get 06)
-                SizeY = int.Parse(Processing.footprint.Substring(2, 2));  // Record is 0603R  (This variable just get 03)
-
-                PositionX = Processing.midX / 10;  // Record Mid X is 660.236mil, change it to 66.0236 
-                PositionY = Processing.midY / 10;  // Record Mid Y is 1603.937mil, change it to 160.3937
-
-                MidSizeX = SizeX / 2;  // Find the mid of size X (The middle of 6 is 3)
-                MidSizeY = SizeY / 2;  // Find the mid of size Y (The middle of 3 is 1.5)
-
-                // Find the start and end point
-                StartingX = PositionX - MidSizeX; 
-                EndingX = PositionX + MidSizeX;
-
-                StartingY = PositionY - MidSizeY;
-                EndingY = PositionY + MidSizeY;
-
-                for (float IteratorY = StartingY; IteratorY < (EndingY + Increment); IteratorY += Increment) 
-                {
-                    for (float IteratorX = StartingX; IteratorX < (EndingX + Increment); IteratorX += Increment)
-                    {
-                        // First plane on top
-                        writer.Write(IteratorX.ToString("0.0000") + "    " + IteratorY.ToString("0.0000") + "    " + Z_Top.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
-                        // Second plane on bottom
-                        writer.Write(IteratorX.ToString("0.0000") + "    " + IteratorY.ToString("0.0000") + "    " + Z_Bottom.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
-
-                        if (IteratorY == StartingY || IteratorY == EndingY || IteratorX == StartingX || IteratorX == EndingX)
-                        {
-                            for (float IteratorZ = Z_Bottom; IteratorZ < Z_Top; IteratorZ += Increment)
-                            {
-                                writer.Write(IteratorX.ToString("0.0000") + "    " + IteratorY.ToString("0.0000") + "    " + IteratorZ.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
-                            }
-                        }
-                        
-                    }
                 }
 
+                Draw_Plane(Mid_Length, Mid_Width, Mid_Height, Plane_MidPoint, out Generate_Plane_Point); // call draw plane function
+
+                for (int IteratorTest = 0; IteratorTest < Generate_Plane_Point.Count; IteratorTest++)
+                {                    
+                    writer.Write(Generate_Plane_Point[IteratorTest].x.ToString("0.0000") + "    " + Generate_Plane_Point[IteratorTest].y.ToString("0.0000") + "    " + Generate_Plane_Point[IteratorTest].z.ToString("0.0000") + "    " + i.ToString("0000") + "\n");
+                    Store_BoxPlane_Point.Add(Generate_Plane_Point[IteratorTest]);
+                }
+                
             }
             writer.Close();
         }
