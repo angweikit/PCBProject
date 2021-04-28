@@ -34,7 +34,7 @@ namespace PCB
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(47, 28);
+            this.btnLoad.Location = new System.Drawing.Point(116, 12);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(83, 34);
             this.btnLoad.TabIndex = 0;
@@ -46,7 +46,7 @@ namespace PCB
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(332, 181);
             this.Controls.Add(this.btnLoad);
             this.Name = "Form1";
             this.Text = "Form1";
