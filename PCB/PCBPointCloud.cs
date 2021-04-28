@@ -13,7 +13,7 @@ namespace PCB
     {
         public OpenFileDialog openModel;
 
-        const int Number_Plane = 6;
+        const int NUMBER_PLANE = 6;
 
         const int TOP_PLANE = 0;
         const int BOTTOM_PLANE = 1;
@@ -22,7 +22,7 @@ namespace PCB
         const int BACK_PLANE = 4;
         const int FRONT_PLANE = 5;
 
-        const float RESOLUTION = 0.01f; //100 points for every mm
+        const float RESOLUTION = 0.03f; //100 points for every mm
 
         StreamWriter writer;
 
@@ -63,19 +63,15 @@ namespace PCB
                     //PointCloudSize = lines.GetLength(0) * VertexAttribSize;
 
                     List<Component> pcbWay = new List<Component>();
-                    List<Coordinate> Store_BoxPlane_Point = new List<Coordinate>();
 
                     PCBWayList(lines, out pcbWay);
-                    Draw_Box(pcbWay);
+                    Component_Data_Control(pcbWay);
                 }
                 catch (Exception err)
                 {
                     System.Windows.Forms.MessageBox.Show("Read_XYZ: read error in file :  " + fileName + " : at line: " + i.ToString() + " ; " + err.Message);
                 }
-            }
-
-            
-
+            }   
         }
 
         public void PCBWayList(string[] lines, out List<Component> PCBWay_Output)
@@ -101,92 +97,96 @@ namespace PCB
             }
         }
 
-        public void Draw_Box(List<Component> PCBWay_Input)
-        {         
-            float Length_X, Length_Y, Length_Z;
-
-            //Coordinate [] Generate_Plane_Point = new Coordinate [3000000];
-
+        public void Component_Data_Control(List<Component> PCBWay_Input)
+        {
             for (int Iterator = 0; Iterator < PCBWay_Input.Count; Iterator++)
             {
                 Coordinate Position = new Coordinate();
-                Coordinate Mid = new Coordinate();
-
+                Length_Size Component_Length = new Length_Size();
+       
                 float z = 600; // coordinate z
-                float Convert_Value = 10;
+                float Convert_Value = 0.1f;
 
-                Length_X = int.Parse(PCBWay_Input[Iterator].footprint.Substring(0, 2));  // Record is 0603R  (This variable just get 06);
-                Length_Y = int.Parse(PCBWay_Input[Iterator].footprint.Substring(2, 2));  // Record is 0603R  (This variable just get 03);
-                Length_Z = 1;
+                Component_Length.x = int.Parse(PCBWay_Input[Iterator].footprint.Substring(0, 2));  // Record is 0603R  (This variable just get 06);
+                Component_Length.y = int.Parse(PCBWay_Input[Iterator].footprint.Substring(2, 2));  // Record is 0603R  (This variable just get 03);
+                Component_Length.z = 1;
 
-                Position.x = PCBWay_Input[Iterator].midX / Convert_Value;  // Record Mid X is 660.236mil, change it to 66.0236 
-                Position.y = PCBWay_Input[Iterator].midY / Convert_Value;  // Record Mid Y is 1603.937mil, change it to 160.3937
-                Position.z = z / Convert_Value;
+                Position.x = PCBWay_Input[Iterator].midX * Convert_Value;  // Record Mid X is 660.236mil, change it to 66.0236 
+                Position.y = PCBWay_Input[Iterator].midY * Convert_Value;  // Record Mid Y is 1603.937mil, change it to 160.3937
+                Position.z = z * Convert_Value;
 
-                for (int InteratorMid = 0; InteratorMid < Number_Plane; InteratorMid++) 
-                {               
-                    if (InteratorMid == TOP_PLANE)
-                    {
-                        Mid.x = Position.x;
-                        Mid.y = Position.y;
-                        Mid.z = (float)(Position.z + Length_Z * 0.5);
-                        Draw_Plane(Length_X, Length_Y, Length_Z, 0, 0, 0, Mid); // call draw plane function
-                    }
-                    else if(InteratorMid == BOTTOM_PLANE)
-                    {
-                        Mid.x = Position.x;
-                        Mid.y = Position.y;
-                        Mid.z = (float)(Position.z - Length_Z * 0.5);
-                        Draw_Plane(Length_X, Length_Y, Length_Z, 0, 0, 0, Mid); // call draw plane function
-                    }
-                    else if (InteratorMid == RIGHT_PLANE)
-                    {
-                        Mid.x = (float)(Position.x + Length_X * 0.5);
-                        Mid.y = Position.y;
-                        Mid.z = Position.z;
-                        Draw_Plane(Length_Y, Length_Z, Length_X, 90, 0, 90, Mid); // call draw plane function
-                    }
-                    else if (InteratorMid == LEFT_PLANE)
-                    {
-                        Mid.x = (float)(Position.x - Length_X * 0.5);
-                        Mid.y = Position.y;
-                        Mid.z = Position.z;
-                        Draw_Plane(Length_Y, Length_Z, Length_X, 90, 0, 90, Mid); // call draw plane function
-                    }
-                    else if (InteratorMid == BACK_PLANE)
-                    {
-                        Mid.x = Position.x;
-                        Mid.y = (float)(Position.y + Length_Y * 0.5);
-                        Mid.z = Position.z;
-                        Draw_Plane(Length_X, Length_Z, Length_Y, 90, 0, 0, Mid); // call draw plane function
-                    }
-                    else if (InteratorMid == FRONT_PLANE)
-                    {
-                        Mid.x = Position.x;
-                        Mid.y = (float)(Position.y - Length_Y * 0.5);
-                        Mid.z = Position.z;
-                        Draw_Plane(Length_X, Length_Z, Length_Y, 90, 0, 0, Mid); // call draw plane function
-                    }
-                }    
+                Draw_Box(Component_Length, Position);
             }
-            //writer.Close();
+        }
+        public void Draw_Box(Length_Size Component_Length, Coordinate Position)
+        {           
+            Coordinate Mid = new Coordinate();
+
+            for (int InteratorMid = 0; InteratorMid < NUMBER_PLANE; InteratorMid++)
+            {
+                if (InteratorMid == TOP_PLANE)
+                {
+                    Mid.x = Position.x;
+                    Mid.y = Position.y;
+                    Mid.z = (float)(Position.z + Component_Length.z * 0.5);
+                    Draw_Plane(Mid, Component_Length.x, Component_Length.y, Component_Length.z, 90, 45, 0); // draw the top plane
+                }
+                //else if (InteratorMid == BOTTOM_PLANE)
+                //{
+                //    Mid.x = Position.x;
+                //    Mid.y = Position.y;
+                //    Mid.z = (float)(Position.z - Component_Length.z * 0.5);
+                //    Draw_Plane(Mid, Component_Length.x, Component_Length.y, Component_Length.z, 0, 0, 0); // draw the bottom plane
+                //}
+                //else if (InteratorMid == RIGHT_PLANE)
+                //{
+                //    Mid.x = (float)(Position.x + Component_Length.x * 0.5);
+                //    Mid.y = Position.y;
+                //    Mid.z = Position.z;
+                //    Draw_Plane(Mid, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the right plane
+                //}
+                //else if (InteratorMid == LEFT_PLANE)
+                //{
+                //    Mid.x = (float)(Position.x - Component_Length.x * 0.5);
+                //    Mid.y = Position.y;
+                //    Mid.z = Position.z;
+                //    Draw_Plane(Mid, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the left plane
+                //}
+                //else if (InteratorMid == BACK_PLANE)
+                //{
+                //    Mid.x = Position.x;
+                //    Mid.y = (float)(Position.y + Component_Length.y * 0.5);
+                //    Mid.z = Position.z;
+                //    Draw_Plane(Mid, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0); // draw the back plane
+                //}
+                //else if (InteratorMid == FRONT_PLANE)
+                //{
+                //    Mid.x = Position.x;
+                //    Mid.y = (float)(Position.y - Component_Length.y * 0.5);
+                //    Mid.z = Position.z;
+                //    Draw_Plane(Mid, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0);// draw the front plane
+                //}
+            }
+
         }
 
-        public void Draw_Plane(float Length_X, float Length_Y, float Length_Z, double Rotation_X, double Rotation_Y, double Rotation_Z, Coordinate Plane_MidPoint)
+        public void Draw_Plane(Coordinate Mid_Coordinate,float Length_X, float Length_Y, float Length_Z, double Rotation_X, double Rotation_Y, double Rotation_Z)
         {
             int PointCloudLength = (int)(((Length_X + 1) / RESOLUTION) * ((Length_Y + 1) / RESOLUTION) + 50);
 
             Coordinate[] PointCloud_Plane = new Coordinate[PointCloudLength];
 
             int PointIndex = 0;
+            int intensity = 200;
 
             float StartingX;
             float StartingY;
             float StartingZ;
+          
 
-            StartingX = (float)(Plane_MidPoint.x - (Length_X * 0.5));
-            StartingY = (float)(Plane_MidPoint.y - (Length_Y * 0.5));
-            StartingZ = (float)(Plane_MidPoint.z - (Length_Z * 0.5));
+            StartingX = (float)(Mid_Coordinate.x - (Length_X * 0.5));
+            StartingY = (float)(Mid_Coordinate.y - (Length_Y * 0.5));
+            StartingZ = (float)(Mid_Coordinate.z);
 
             //generate flat plane according to coordinate and size specified
             for (int Iterator_Y = 0; Iterator_Y < (Length_Y / RESOLUTION); Iterator_Y++)
@@ -205,36 +205,31 @@ namespace PCB
             Rotation_X *= (Math.PI / 180);
             Rotation_Y *= (Math.PI / 180);
             Rotation_Z *= (Math.PI / 180);
-            //Origin of rotation to be coordinate from Plane_MidPoint            
+            //Origin of rotation to be coordinate from Mid_Coordinate            
 
-            if (Rotation_X != 0 || (Rotation_X == 0 && Rotation_Y == 0 && Rotation_Z == 0))
+            //if (Rotation_X != 0)
             {
                 for (int Iterator = 0; Iterator < PointIndex; Iterator++)
                 {
-                    Coordinate Origin = Plane_MidPoint;
-                    float Hypotenuse = PointCloud_Plane[Iterator].y - Origin.y;
+                    Coordinate Origin = Mid_Coordinate;
+                    float HypotenuseX = PointCloud_Plane[Iterator].x - Origin.x;
+                    float HypotenuseY = PointCloud_Plane[Iterator].y - Origin.y;
 
-                    PointCloud_Plane[Iterator].y = Origin.y + (float)(Hypotenuse * Math.Cos(Rotation_X));
-                    PointCloud_Plane[Iterator].z = Origin.z + (float)(Hypotenuse * Math.Sin(Rotation_X));
-
-                    if (Rotation_Z == 0)
-                    {
-                        writer.Write(PointCloud_Plane[Iterator].x.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].y.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].z.ToString("0.0000") + "    200\n");
-                    }
+                    PointCloud_Plane[Iterator].x = Origin.x + (float)(HypotenuseX * Math.Cos(Rotation_Y));
+                    PointCloud_Plane[Iterator].y = Origin.y + (float)(HypotenuseY * Math.Cos(Rotation_X));
+                    PointCloud_Plane[Iterator].z = Origin.z + (float)(HypotenuseY * Math.Sin(Rotation_X) * + (float)(HypotenuseX * Math.Sin(Rotation_Y)));
                 }
             }
 
-            if (Rotation_Y != 0)
+            //if (Rotation_Y != 0)
             {
                 for (int Iterator = 0; Iterator < PointIndex; Iterator++)
                 {
-                    Coordinate Origin = Plane_MidPoint;
+                    Coordinate Origin = Mid_Coordinate;
                     float Hypotenuse = PointCloud_Plane[Iterator].x - Origin.x;
 
-                    PointCloud_Plane[Iterator].x = Origin.x + (float)(Hypotenuse * Math.Cos(Rotation_Y));
-                    PointCloud_Plane[Iterator].z = Origin.z + (float)(Hypotenuse * Math.Sin(Rotation_Y));
-
-                    writer.Write(PointCloud_Plane[Iterator].x.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].y.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].z.ToString("0.0000") + "    200\n");
+                    //PointCloud_Plane[Iterator].x = Origin.x + (float)(Hypotenuse * Math.Cos(Rotation_Y));
+                    //PointCloud_Plane[Iterator].z = Origin.z + (float)(Hypotenuse * Math.Sin(Rotation_Y));
                 }
             }
 
@@ -242,14 +237,17 @@ namespace PCB
             {
                 for (int Iterator = 0; Iterator < PointIndex; Iterator++)
                 {
-                    Coordinate Origin = Plane_MidPoint;
+                    Coordinate Origin = Mid_Coordinate;
                     float Hypotenuse = PointCloud_Plane[Iterator].x - Origin.x;
 
-                    PointCloud_Plane[Iterator].x = Origin.x + (float)(Hypotenuse * Math.Cos(Rotation_Z));
-                    PointCloud_Plane[Iterator].y = Origin.y + (float)(Hypotenuse * Math.Sin(Rotation_Z));
-
-                    writer.Write(PointCloud_Plane[Iterator].x.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].y.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].z.ToString("0.0000") + "    200\n");
+                    //PointCloud_Plane[Iterator].x = Origin.x + (float)(Hypotenuse * Math.Cos(Rotation_Z));
+                    //PointCloud_Plane[Iterator].y = Origin.y + (float)(Hypotenuse * Math.Sin(Rotation_Z));
                 }
+            }
+
+            for (int Iterator = 0; Iterator < PointIndex; Iterator++)
+            {
+                writer.Write(PointCloud_Plane[Iterator].x.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].y.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].z.ToString("0.0000") + "    " + intensity.ToString("0000") + "\n");
             }
         }
 
