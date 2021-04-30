@@ -34,7 +34,7 @@ namespace PCB
 
             PointCloudSize = 0;
 
-            string FilePath = @"C:\Users\USER\Desktop\Documentation\PCB\test123.txt"; // set the file path
+            string FilePath = @"D:\PCB\test123.txt"; // set the file path
 
             FileStream fs1 = new FileStream(FilePath, FileMode.Create, FileAccess.Write); // Create a new text file
             writer = new StreamWriter(fs1);
@@ -71,7 +71,7 @@ namespace PCB
                 {
                     System.Windows.Forms.MessageBox.Show("Read_XYZ: read error in file :  " + fileName + " : at line: " + i.ToString() + " ; " + err.Message);
                 }
-            }   
+            }
         }
 
         public void PCBWayList(string[] lines, out List<Component> PCBWay_Output)
@@ -103,7 +103,7 @@ namespace PCB
             {
                 Coordinate Position = new Coordinate();
                 Length_Size Component_Length = new Length_Size();
-       
+
                 float z = 600; // coordinate z
                 float Convert_Value = 0.1f;
 
@@ -119,7 +119,7 @@ namespace PCB
             }
         }
         public void Draw_Box(Length_Size Component_Length, Coordinate Position)
-        {           
+        {
             Coordinate Mid = new Coordinate();
 
             for (int InteratorMid = 0; InteratorMid < NUMBER_PLANE; InteratorMid++)
@@ -129,60 +129,59 @@ namespace PCB
                     Mid.x = Position.x;
                     Mid.y = Position.y;
                     Mid.z = (float)(Position.z + Component_Length.z * 0.5);
-                    Draw_Plane(Mid, Component_Length.x, Component_Length.y, Component_Length.z, 90, 45, 0); // draw the top plane
+                    Draw_Plane(Mid, Component_Length.x, Component_Length.y, Component_Length.z, 0, 0, 0); // draw the top plane
                 }
-                //else if (InteratorMid == BOTTOM_PLANE)
-                //{
-                //    Mid.x = Position.x;
-                //    Mid.y = Position.y;
-                //    Mid.z = (float)(Position.z - Component_Length.z * 0.5);
-                //    Draw_Plane(Mid, Component_Length.x, Component_Length.y, Component_Length.z, 0, 0, 0); // draw the bottom plane
-                //}
-                //else if (InteratorMid == RIGHT_PLANE)
-                //{
-                //    Mid.x = (float)(Position.x + Component_Length.x * 0.5);
-                //    Mid.y = Position.y;
-                //    Mid.z = Position.z;
-                //    Draw_Plane(Mid, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the right plane
-                //}
-                //else if (InteratorMid == LEFT_PLANE)
-                //{
-                //    Mid.x = (float)(Position.x - Component_Length.x * 0.5);
-                //    Mid.y = Position.y;
-                //    Mid.z = Position.z;
-                //    Draw_Plane(Mid, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the left plane
-                //}
-                //else if (InteratorMid == BACK_PLANE)
-                //{
-                //    Mid.x = Position.x;
-                //    Mid.y = (float)(Position.y + Component_Length.y * 0.5);
-                //    Mid.z = Position.z;
-                //    Draw_Plane(Mid, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0); // draw the back plane
-                //}
-                //else if (InteratorMid == FRONT_PLANE)
-                //{
-                //    Mid.x = Position.x;
-                //    Mid.y = (float)(Position.y - Component_Length.y * 0.5);
-                //    Mid.z = Position.z;
-                //    Draw_Plane(Mid, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0);// draw the front plane
-                //}
+                else if (InteratorMid == BOTTOM_PLANE)
+                {
+                    Mid.x = Position.x;
+                    Mid.y = Position.y;
+                    Mid.z = (float)(Position.z - Component_Length.z * 0.5);
+                    Draw_Plane(Mid, Component_Length.x, Component_Length.y, Component_Length.z, 0, 0, 0); // draw the bottom plane
+                }
+                else if (InteratorMid == RIGHT_PLANE)
+                {
+                    Mid.x = (float)(Position.x + Component_Length.x * 0.5);
+                    Mid.y = Position.y;
+                    Mid.z = Position.z;
+                    Draw_Plane(Mid, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the right plane
+                }
+                else if (InteratorMid == LEFT_PLANE)
+                {
+                    Mid.x = (float)(Position.x - Component_Length.x * 0.5);
+                    Mid.y = Position.y;
+                    Mid.z = Position.z;
+                    Draw_Plane(Mid, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the left plane
+                }
+                else if (InteratorMid == BACK_PLANE)
+                {
+                    Mid.x = Position.x;
+                    Mid.y = (float)(Position.y + Component_Length.y * 0.5);
+                    Mid.z = Position.z;
+                    Draw_Plane(Mid, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0); // draw the back plane
+                }
+                else if (InteratorMid == FRONT_PLANE)
+                {
+                    Mid.x = Position.x;
+                    Mid.y = (float)(Position.y - Component_Length.y * 0.5);
+                    Mid.z = Position.z;
+                    Draw_Plane(Mid, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0);// draw the front plane
+                }
             }
 
         }
-
-        public void Draw_Plane(Coordinate Mid_Coordinate,float Length_X, float Length_Y, float Length_Z, double Rotation_X, double Rotation_Y, double Rotation_Z)
+        public void Draw_Plane(Coordinate Mid_Coordinate, float Length_X, float Length_Y, float Length_Z, double Rotation_X, double Rotation_Y, double Rotation_Z)
         {
             int PointCloudLength = (int)(((Length_X + 1) / RESOLUTION) * ((Length_Y + 1) / RESOLUTION) + 50);
 
             Coordinate[] PointCloud_Plane = new Coordinate[PointCloudLength];
 
             int PointIndex = 0;
-            int intensity = 200;
+            int intensity = 150;
 
             float StartingX;
             float StartingY;
             float StartingZ;
-          
+
 
             StartingX = (float)(Mid_Coordinate.x - (Length_X * 0.5));
             StartingY = (float)(Mid_Coordinate.y - (Length_Y * 0.5));
@@ -207,62 +206,117 @@ namespace PCB
             Rotation_Z *= (Math.PI / 180);
             //Origin of rotation to be coordinate from Mid_Coordinate            
 
-            //if (Rotation_X != 0)
+            for (int Iterator = 0; Iterator < PointIndex; Iterator++)
             {
-                for (int Iterator = 0; Iterator < PointIndex; Iterator++)
-                {
-                    Coordinate Origin = Mid_Coordinate;
-                    float HypotenuseX = PointCloud_Plane[Iterator].x - Origin.x;
-                    float HypotenuseY = PointCloud_Plane[Iterator].y - Origin.y;
+                Coordinate Origin = Mid_Coordinate;
+                //float X, Y, Z;
 
-                    PointCloud_Plane[Iterator].x = Origin.x + (float)(HypotenuseX * Math.Cos(Rotation_Y));
-                    PointCloud_Plane[Iterator].y = Origin.y + (float)(HypotenuseY * Math.Cos(Rotation_X));
-                    PointCloud_Plane[Iterator].z = Origin.z + (float)(HypotenuseY * Math.Sin(Rotation_X) * + (float)(HypotenuseX * Math.Sin(Rotation_Y)));
-                }
+                Rotate_X(PointCloud_Plane[Iterator], Origin, Rotation_X);
+                Rotate_Y(PointCloud_Plane[Iterator], Origin, Rotation_Y);
+                Rotate_Z(PointCloud_Plane[Iterator], Origin, Rotation_Z);
+
+                //PointCloud_Plane[Iterator].x -= Origin.x;
+                //PointCloud_Plane[Iterator].y -= Origin.y;
+                //PointCloud_Plane[Iterator].z -= Origin.z;
+
+                //X = PointCloud_Plane[Iterator].x;
+                //Y = PointCloud_Plane[Iterator].y;
+                //Z = PointCloud_Plane[Iterator].z;
+
+                ////Rotate X-axis
+                //PointCloud_Plane[Iterator].y = (float)((Y * Math.Cos(Rotation_X) - (Z * Math.Sin(Rotation_X))));
+                //PointCloud_Plane[Iterator].z = (float)((Y * Math.Sin(Rotation_X) + (Z * Math.Cos(Rotation_X))));
+
+                //X = PointCloud_Plane[Iterator].x;
+                //Y = PointCloud_Plane[Iterator].y;
+                //Z = PointCloud_Plane[Iterator].z;
+
+                ////Rotate Y-axis
+                //PointCloud_Plane[Iterator].x = (float)((Z * Math.Sin(Rotation_Y) + (X * Math.Cos(Rotation_Y))));
+                //PointCloud_Plane[Iterator].z = (float)((Z * Math.Cos(Rotation_Y) - (X * Math.Sin(Rotation_Y))));
+
+                //X = PointCloud_Plane[Iterator].x;
+                //Y = PointCloud_Plane[Iterator].y;
+                //Z = PointCloud_Plane[Iterator].z;
+
+                ////Rotate Z-axis
+                //PointCloud_Plane[Iterator].x = (float)((X * Math.Cos(Rotation_Z) - (Y * Math.Sin(Rotation_Z))));
+                //PointCloud_Plane[Iterator].y = (float)((X * Math.Sin(Rotation_Z) + (Y * Math.Cos(Rotation_Z))));
+
+                //PointCloud_Plane[Iterator].x += Origin.x;
+                //PointCloud_Plane[Iterator].y += Origin.y;
+                //PointCloud_Plane[Iterator].z += Origin.z;
             }
-
-            //if (Rotation_Y != 0)
-            {
-                for (int Iterator = 0; Iterator < PointIndex; Iterator++)
-                {
-                    Coordinate Origin = Mid_Coordinate;
-                    float Hypotenuse = PointCloud_Plane[Iterator].x - Origin.x;
-
-                    //PointCloud_Plane[Iterator].x = Origin.x + (float)(Hypotenuse * Math.Cos(Rotation_Y));
-                    //PointCloud_Plane[Iterator].z = Origin.z + (float)(Hypotenuse * Math.Sin(Rotation_Y));
-                }
-            }
-
-            if (Rotation_Z != 0)
-            {
-                for (int Iterator = 0; Iterator < PointIndex; Iterator++)
-                {
-                    Coordinate Origin = Mid_Coordinate;
-                    float Hypotenuse = PointCloud_Plane[Iterator].x - Origin.x;
-
-                    //PointCloud_Plane[Iterator].x = Origin.x + (float)(Hypotenuse * Math.Cos(Rotation_Z));
-                    //PointCloud_Plane[Iterator].y = Origin.y + (float)(Hypotenuse * Math.Sin(Rotation_Z));
-                }
-            }
-
+            
             for (int Iterator = 0; Iterator < PointIndex; Iterator++)
             {
                 writer.Write(PointCloud_Plane[Iterator].x.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].y.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].z.ToString("0.0000") + "    " + intensity.ToString("0000") + "\n");
             }
         }
 
-        //public void Converter_Unit()
-        //{
-        //    string Convert_Unit= "mil";
-        //    float Convert_Value = 0;
+        //Rotate X
+        public void Rotate_X(Coordinate PointCloud_Plane, Coordinate Origin, double Rotation_X)
+        {
+            float X, Y, Z;
 
-        //    if (Convert_Unit == "mil")
-        //    {
-        //        Convert_Value = 10;
-        //    }
+            PointCloud_Plane.x -= Origin.x;
+            PointCloud_Plane.y -= Origin.y;
+            PointCloud_Plane.z -= Origin.z;
 
-        //    
-        //}
+            X = PointCloud_Plane.x;
+            Y = PointCloud_Plane.y;
+            Z = PointCloud_Plane.z;
+        
+            PointCloud_Plane.y = (float)((Y * Math.Cos(Rotation_X) - (Z * Math.Sin(Rotation_X))));
+            PointCloud_Plane.z = (float)((Y * Math.Sin(Rotation_X) + (Z * Math.Cos(Rotation_X))));
+
+            PointCloud_Plane.x += Origin.x;
+            PointCloud_Plane.y += Origin.y;
+            PointCloud_Plane.z += Origin.z;
+        }
+
+        //Rotate Y
+        public void Rotate_Y(Coordinate PointCloud_Plane, Coordinate Origin, double Rotation_Y)
+        {
+            float X, Y, Z;
+
+            PointCloud_Plane.x -= Origin.x;
+            PointCloud_Plane.y -= Origin.y;
+            PointCloud_Plane.z -= Origin.z;
+
+            X = PointCloud_Plane.x;
+            Y = PointCloud_Plane.y;
+            Z = PointCloud_Plane.z;
+
+            PointCloud_Plane.x = (float)((Z * Math.Sin(Rotation_Y) + (X * Math.Cos(Rotation_Y))));
+            PointCloud_Plane.z = (float)((Z * Math.Cos(Rotation_Y) - (X * Math.Sin(Rotation_Y))));
+
+            PointCloud_Plane.x += Origin.x;
+            PointCloud_Plane.y += Origin.y;
+            PointCloud_Plane.z += Origin.z;
+        }
+
+        //Rotate Z
+        public void Rotate_Z(Coordinate PointCloud_Plane, Coordinate Origin, double Rotation_Z)
+        {
+            float X, Y, Z;
+
+            PointCloud_Plane.x -= Origin.x;
+            PointCloud_Plane.y -= Origin.y;
+            PointCloud_Plane.z -= Origin.z;
+
+            X = PointCloud_Plane.x;
+            Y = PointCloud_Plane.y;
+            Z = PointCloud_Plane.z;
+
+            PointCloud_Plane.x = (float)((X * Math.Cos(Rotation_Z) - (Y * Math.Sin(Rotation_Z))));
+            PointCloud_Plane.y = (float)((X * Math.Sin(Rotation_Z) + (Y * Math.Cos(Rotation_Z))));
+
+            PointCloud_Plane.x += Origin.x;
+            PointCloud_Plane.y += Origin.y;
+            PointCloud_Plane.z += Origin.z;
+        }
+
     }
 
     public class Coordinate
