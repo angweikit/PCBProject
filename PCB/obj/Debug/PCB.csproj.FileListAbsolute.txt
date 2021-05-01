@@ -8,3 +8,13 @@ C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.csproj.GenerateResource.cache
 C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.csproj.CoreCompileInputs.cache
 C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.exe
 C:\Users\USER\source\repos\PCB\PCB\obj\Debug\PCB.pdb
+D:\VS Projects\From WeiKit\PCB\PCB\bin\Debug\PCB.exe.config
+D:\VS Projects\From WeiKit\PCB\PCB\bin\Debug\PCB.exe
+D:\VS Projects\From WeiKit\PCB\PCB\bin\Debug\PCB.pdb
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.csprojAssemblyReference.cache
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.Form1.resources
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.Properties.Resources.resources
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.csproj.GenerateResource.cache
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.csproj.CoreCompileInputs.cache
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.exe
+D:\VS Projects\From WeiKit\PCB\PCB\obj\Debug\PCB.pdb
