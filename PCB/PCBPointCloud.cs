@@ -107,6 +107,8 @@ namespace PCB
             for (int Iterator = 0; Iterator < PCBWay_Input.Count; Iterator++)
             {
                 Coordinate Position = new Coordinate();
+                Angle Rotation = new Angle();
+
                 Length_Size Component_Length = new Length_Size();
 
                 float z = 600; // coordinate z
@@ -120,12 +122,17 @@ namespace PCB
                 Position.y = PCBWay_Input[Iterator].midY * Convert_Value;  // Record Mid Y is 1603.937mil, change it to 160.3937
                 Position.z = z * Convert_Value;
 
-                Draw_Box(Component_Length, Position);
+                Rotation.x = 30;
+                Rotation.y = 0;
+                Rotation.z = 0;
+
+                Draw_Box(Component_Length, Position, Rotation);
             }
         }
-        public void Draw_Box(Length_Size Component_Length, Coordinate Position)
+        public void Draw_Box(Length_Size Component_Length, Coordinate Position, Angle Rotation)
         {
             Coordinate MidPoint = new Coordinate();
+            Coordinate RotationMidPoint = new Coordinate();      
 
             for (int InteratorMid = 0; InteratorMid < NUMBER_PLANE; InteratorMid++)
             {
@@ -134,42 +141,60 @@ namespace PCB
                     MidPoint.x = Position.x;
                     MidPoint.y = Position.y;
                     MidPoint.z = (float)(Position.z + Component_Length.z * 0.5);
-                    Draw_Plane(MidPoint, Component_Length.x, Component_Length.y, Component_Length.z, 0, 0, 0); // draw the top plane
+
+                    // Top plane
+                    Draw_Plane(Rotate_Angle(RotationMidPoint, MidPoint, Position, Rotation),
+                        Component_Length.x, Component_Length.y, Component_Length.z, 0 + Rotation.x, 0 + Rotation.y, 0 + Rotation.z);
                 }
                 else if (InteratorMid == BOTTOM_PLANE)
                 {
                     MidPoint.x = Position.x;
                     MidPoint.y = Position.y;
                     MidPoint.z = (float)(Position.z - Component_Length.z * 0.5);
-                    Draw_Plane(MidPoint, Component_Length.x, Component_Length.y, Component_Length.z, 0, 0, 0); // draw the bottom plane
+
+                    // Bottom plane
+                    Draw_Plane(Rotate_Angle(RotationMidPoint, MidPoint, Position, Rotation), 
+                        Component_Length.x, Component_Length.y, Component_Length.z, 0 + Rotation.x, 0 + Rotation.y, 0 + Rotation.z);
                 }
                 else if (InteratorMid == RIGHT_PLANE)
                 {
                     MidPoint.x = (float)(Position.x + Component_Length.x * 0.5);
                     MidPoint.y = Position.y;
                     MidPoint.z = Position.z;
-                    Draw_Plane(MidPoint, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the right plane
+
+                    // Right plane
+                    Draw_Plane(Rotate_Angle(RotationMidPoint, MidPoint, Position, Rotation),
+                        Component_Length.z, Component_Length.y, Component_Length.x, 0 + Rotation.x, 90 + Rotation.y, 0 + Rotation.z);
                 }
                 else if (InteratorMid == LEFT_PLANE)
                 {
                     MidPoint.x = (float)(Position.x - Component_Length.x * 0.5);
                     MidPoint.y = Position.y;
                     MidPoint.z = Position.z;
-                    Draw_Plane(MidPoint, Component_Length.z, Component_Length.y, Component_Length.x, 0, 90, 0); // draw the left plane
+
+                    // Left plane
+                    Draw_Plane(Rotate_Angle(RotationMidPoint, MidPoint, Position, Rotation),
+                        Component_Length.z, Component_Length.y, Component_Length.x, 0 + Rotation.x, 90 + Rotation.y, 0 + Rotation.z);
                 }
                 else if (InteratorMid == BACK_PLANE)
                 {
                     MidPoint.x = Position.x;
                     MidPoint.y = (float)(Position.y + Component_Length.y * 0.5);
                     MidPoint.z = Position.z;
-                    Draw_Plane(MidPoint, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0); // draw the back plane
+
+                    // Back plane
+                    Draw_Plane(Rotate_Angle(RotationMidPoint, MidPoint, Position, Rotation), 
+                        Component_Length.x, Component_Length.z, Component_Length.y, 90 + Rotation.x, 0 + Rotation.y, 0 + Rotation.z); 
                 }
                 else if (InteratorMid == FRONT_PLANE)
                 {
                     MidPoint.x = Position.x;
                     MidPoint.y = (float)(Position.y - Component_Length.y * 0.5);
                     MidPoint.z = Position.z;
-                    Draw_Plane(MidPoint, Component_Length.x, Component_Length.z, Component_Length.y, 90, 0, 0);// draw the front plane
+
+                    // Front plane
+                    Draw_Plane(Rotate_Angle(RotationMidPoint, MidPoint, Position, Rotation), 
+                        Component_Length.x, Component_Length.z, Component_Length.y, 90 + Rotation.x, 0 + Rotation.y, 0 + Rotation.z);
                 }
             }
 
@@ -241,7 +266,6 @@ namespace PCB
             return Rotate3DAroundOrigin(ROTATE_Z, Input_Coordinate, Origin_Coordinate, Rotation_Angle);
         }
 
-
         private Coordinate Rotate3DAroundOrigin(int RotationType, Coordinate Input_Coordinate, Coordinate Origin, double Rotation_Angle)
         {
             float X = 0, Y = 0, Z = 0;
@@ -285,6 +309,56 @@ namespace PCB
             return Input_Coordinate;
         }
 
+        //RotationMidPoint = The midpoint after rotate
+        //MidPoint = The origin midpoint of a plane / point to rotate
+        //Position = The box midpoint and center point of rotation
+        //Rotation = The rotation angle in degrees
+
+        public Coordinate Rotate_Angle(Coordinate RotationMidPoint, Coordinate MidPoint, Coordinate Position, Angle Rotation)
+        {
+            double angleInRadians;
+            double cosTheta;
+            double sinTheta;
+
+            if (Rotation.x != 0)
+            {
+                angleInRadians = Rotation.x * (Math.PI / 180);
+                cosTheta = Math.Cos(angleInRadians);
+                sinTheta = Math.Sin(angleInRadians);
+
+                RotationMidPoint.x = MidPoint.x;
+                RotationMidPoint.y = (float)(cosTheta * (MidPoint.y - Position.y) - sinTheta * (MidPoint.z - Position.z) + Position.y);
+                RotationMidPoint.z = (float)(sinTheta * (MidPoint.y - Position.y) + cosTheta * (MidPoint.z - Position.z) + Position.z);
+                return RotationMidPoint;
+            }
+
+            if(Rotation.y != 0)
+            {
+                angleInRadians = Rotation.y * (Math.PI / 180);
+                cosTheta = Math.Cos(angleInRadians);
+                sinTheta = Math.Sin(angleInRadians);
+
+                RotationMidPoint.x = (float)(cosTheta * (MidPoint.x - Position.x) + sinTheta * (MidPoint.z - Position.z) + Position.x);
+                RotationMidPoint.y = MidPoint.y;
+                RotationMidPoint.z = (float)(cosTheta * (MidPoint.z - Position.z) - sinTheta * (MidPoint.x - Position.x) + Position.z);
+                return RotationMidPoint;
+            }
+
+            if (Rotation.z != 0)
+            {
+                angleInRadians = Rotation.z * (Math.PI / 180);
+                cosTheta = Math.Cos(angleInRadians);
+                sinTheta = Math.Sin(angleInRadians);
+
+                RotationMidPoint.x = (float)(cosTheta * (MidPoint.x - Position.x) - sinTheta * (MidPoint.y - Position.y) + Position.x);
+                RotationMidPoint.y = (float)(sinTheta * (MidPoint.x - Position.x) + cosTheta * (MidPoint.y - Position.y) + Position.y);
+                RotationMidPoint.z = MidPoint.z;
+                return RotationMidPoint;
+            }
+
+            return MidPoint;
+        }
+
     }
 
     public class Coordinate
@@ -299,7 +373,7 @@ namespace PCB
 
     public class Angle
     {
-        public float x, y, z;
+        public double  x, y, z;
     }
     public class Component
     {
