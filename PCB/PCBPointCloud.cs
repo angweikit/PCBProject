@@ -122,7 +122,7 @@ namespace PCB
                 Position.y = PCBWay_Input[Iterator].midY * Convert_Value;  // Record Mid Y is 1603.937mil, change it to 160.3937
                 Position.z = z * Convert_Value;
 
-                Rotation.x = 30;
+                Rotation.x = 0;
                 Rotation.y = 0;
                 Rotation.z = 0;
 
@@ -240,8 +240,14 @@ namespace PCB
                 PointCloud_Plane[Iterator] = Rotate_X(PointCloud_Plane[Iterator], MidPoint_Coordinate, Rotation_X);
                 PointCloud_Plane[Iterator] = Rotate_Y(PointCloud_Plane[Iterator], MidPoint_Coordinate, Rotation_Y);
                 PointCloud_Plane[Iterator] = Rotate_Z(PointCloud_Plane[Iterator], MidPoint_Coordinate, Rotation_Z);
+
+                PointCloud_Plane[Iterator] = Rotate_X(PointCloud_Plane[Iterator], MidPoint_Coordinate, 30 * (Math.PI / 180));
+                PointCloud_Plane[Iterator] = Rotate_Y(PointCloud_Plane[Iterator], MidPoint_Coordinate, 0);
+                PointCloud_Plane[Iterator] = Rotate_Z(PointCloud_Plane[Iterator], MidPoint_Coordinate, 0);
             }
+
             
+
             for (int Iterator = 0; Iterator < PointIndex; Iterator++)
             {
                 writer.Write(PointCloud_Plane[Iterator].x.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].y.ToString("0.0000") + "    " + PointCloud_Plane[Iterator].z.ToString("0.0000") + "    " + intensity.ToString("0000") + "\n");
@@ -341,6 +347,7 @@ namespace PCB
                 RotationMidPoint.x = (float)(cosTheta * (MidPoint.x - Position.x) + sinTheta * (MidPoint.z - Position.z) + Position.x);
                 RotationMidPoint.y = MidPoint.y;
                 RotationMidPoint.z = (float)(cosTheta * (MidPoint.z - Position.z) - sinTheta * (MidPoint.x - Position.x) + Position.z);
+              
                 return RotationMidPoint;
             }
 
@@ -356,7 +363,7 @@ namespace PCB
                 return RotationMidPoint;
             }
 
-            return MidPoint;
+            return MidPoint; // not rotate return origin midpoint
         }
 
     }
